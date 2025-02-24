@@ -30,7 +30,7 @@ function buildGraph(edges) {
   return graph;
 }
 const roadGraph = buildGraph(roads);
-console.log(roadGraph);
+//console.log(roadGraph);
 class VillageState {
   constructor(place, parcels) {
     this.place = place;
@@ -50,3 +50,17 @@ class VillageState {
     }
   }
 }
+let first = new VillageState("Post Office", [
+  { place: "Post Office", address: "Alice's House" },
+]);
+let next = first.move("Marketplace");
+console.log(next.place, next.parcels);
+function randomPick(array) {
+  console.log(array.length);
+  console.log(Math.floor(Math.random() * array.length));
+  return Math.floor(Math.random() * array.length);
+}
+function randomRobot(state) {
+  return roadGraph[state.place][randomPick(roadGraph[state.place])];
+}
+console.log(randomRobot(first));
