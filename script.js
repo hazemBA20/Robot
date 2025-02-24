@@ -30,7 +30,7 @@ function buildGraph(edges) {
   return graph;
 }
 const roadGraph = buildGraph(roads);
-//console.log(roadGraph);
+
 class VillageState {
   constructor(place, parcels) {
     this.place = place;
@@ -68,10 +68,10 @@ function runRobot(state, robot, memory) {
   }
 }
 function randomPick(array) {
-  return Math.floor(Math.random() * array.length);
+  return array[Math.floor(Math.random() * array.length)];
 }
 function randomRobot(state) {
-  return roadGraph[state.place][randomPick(roadGraph[state.place])];
+  return { direction: randomPick(roadGraph[state.place]) };
 }
 console.log(randomRobot(first));
 
@@ -88,3 +88,7 @@ VillageState.random = function (parcelCount = 5) {
   }
   return new VillageState("Post Office", parcels);
 };
+console.log(VillageState.random().parcels);
+
+runRobot(VillageState.random(), randomRobot);
+//console.log(roadGraph);
