@@ -103,18 +103,11 @@ const mailRoute = [
   "Post Office",
 ];
 
-function fixedRoute(state, memory) {
-  let direction;
-  if (memory.length < mailRoute.length) {
-    direction = mailRoute[memory.length];
-  } else {
-    direction =
-      mailRoute[mailRoute.length - (memory.length % mailRoute.length)];
-  }
-  memory.push(state.place);
-  return { direction, memory };
+function routeRobot(state, memory) {
+  if (memory.length === 0) memory = mailRoute;
+  return { direction: memory[0], memory: memory.slice(1) };
 }
 let initialState = VillageState.random();
 let memory = ["Alice's House"];
-runRobot(initialState, fixedRoute, memory);
+runRobot(initialState, routeRobot, []);
 //console.log(roadGraph);
