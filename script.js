@@ -55,6 +55,7 @@ let first = new VillageState("Post Office", [
 ]);
 let next = first.move("Marketplace");
 console.log(next.place, next.parcels);
+
 function runRobot(state, robot, memory) {
   for (let turn = 0; ; turn++) {
     if (state.parcels.length == 0) {
@@ -85,7 +86,7 @@ VillageState.random = function (parcelCount = 5) {
     } while (place === address);
     parcels.push({ place, address });
   }
-  return new VillageState("Alice's House", parcels);
+  return new VillageState("Farm", parcels);
 };
 const mailRoute = [
   "Alice's House",
@@ -107,7 +108,18 @@ function routeRobot(state, memory) {
   if (memory.length === 0) memory = mailRoute;
   return { direction: memory[0], memory: memory.slice(1) };
 }
+function findRoute(graph, from, to) {
+  let work = [{ at: from, route: [] }];
+  for (let i = 0; i < work.length; i++) {
+    let { at, route } = work[i];
+    for (let place of graph[at]) {
+      if (place === to) return route.concat(place);
+      if (!work.some((element) => element.at === place)) {
+        work.push({ at: place, route: route.concat(place) });
+      }
+    }
+  }
+}
 let initialState = VillageState.random();
-let memory = ["Alice's House"];
 runRobot(initialState, routeRobot, []);
 //console.log(roadGraph);
