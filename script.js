@@ -73,7 +73,6 @@ function randomPick(array) {
 function randomRobot(state) {
   return { direction: randomPick(roadGraph[state.place]) };
 }
-console.log(randomRobot(first));
 
 VillageState.random = function (parcelCount = 5) {
   let parcels = [];
@@ -86,9 +85,36 @@ VillageState.random = function (parcelCount = 5) {
     } while (place === address);
     parcels.push({ place, address });
   }
-  return new VillageState("Post Office", parcels);
+  return new VillageState("Alice's House", parcels);
 };
-console.log(VillageState.random().parcels);
+const mailRoute = [
+  "Alice's House",
+  "Cabin",
+  "Alice's House",
+  "Bob's House",
+  "Town Hall",
+  "Daria's House",
+  "Ernie's House",
+  "Grete's House",
+  "Shop",
+  "Grete's House",
+  "Farm",
+  "Marketplace",
+  "Post Office",
+];
 
-runRobot(VillageState.random(), randomRobot);
+function fixedRoute(state, memory) {
+  let direction;
+  if (memory.length < mailRoute.length) {
+    direction = mailRoute[memory.length];
+  } else {
+    direction =
+      mailRoute[mailRoute.length - (memory.length % mailRoute.length)];
+  }
+  memory.push(state.place);
+  return { direction, memory };
+}
+let initialState = VillageState.random();
+let memory = ["Alice's House"];
+runRobot(initialState, fixedRoute, memory);
 //console.log(roadGraph);
