@@ -105,7 +105,7 @@ const mailRoute = [
 ];
 
 function routeRobot(state, memory) {
-  if (memory.length === 0) memory = mailRoute;
+  if (memory.length === 0) memory = findRoute();
   return { direction: memory[0], memory: memory.slice(1) };
 }
 function findRoute(graph, from, to) {
@@ -120,6 +120,22 @@ function findRoute(graph, from, to) {
     }
   }
 }
+function goalOrientedRobot({ place, parcels }, route) {
+  if (route.length == 0) {
+    let parcel = parcels[0];
+    if (parcel.place != place) {
+      route = findRoute(roadGraph, place, parcel.place);
+    } else {
+      route = findRoute(roadGraph, place, parcel.address);
+    }
+  }
+  return { direction: route[0], memory: route.slice(1) };
+}
 let initialState = VillageState.random();
-runRobot(initialState, routeRobot, []);
+function routeRobot(state, memory) {
+  if (memory.length === 0) memory = memory = roadGraph;
+  return { direction: memory[0], memory: memory.slice(1) };
+}
+console.log(initialState);
+runRobot(initialState, goalOrientedRobot, []);
 //console.log(roadGraph);
