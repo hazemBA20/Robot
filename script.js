@@ -86,7 +86,7 @@ VillageState.random = function (parcelCount = 5) {
     } while (place === address);
     parcels.push({ place, address });
   }
-  return new VillageState("Farm", parcels);
+  return new VillageState("Alice's House", parcels);
 };
 const mailRoute = [
   "Alice's House",
@@ -105,7 +105,7 @@ const mailRoute = [
 ];
 
 function routeRobot(state, memory) {
-  if (memory.length === 0) memory = findRoute();
+  if (memory.length === 0) memory = mailRoute;
   return { direction: memory[0], memory: memory.slice(1) };
 }
 function findRoute(graph, from, to) {
@@ -132,10 +132,30 @@ function goalOrientedRobot({ place, parcels }, route) {
   return { direction: route[0], memory: route.slice(1) };
 }
 let initialState = VillageState.random();
-function routeRobot(state, memory) {
-  if (memory.length === 0) memory = memory = roadGraph;
-  return { direction: memory[0], memory: memory.slice(1) };
+
+function compareRobots(robot1, memory1, robot2, memory2) {
+  function run(state, robot, memory) {
+    for (let turn = 0; ; turn++) {
+      if (state.parcels.length == 0) {
+        return turn;
+      }
+      let action = robot(state, memory);
+      state = state.move(action.direction);
+      memory = action.memory;
+    }
+  }
+  arr1 = [];
+  arr2 = [];
+  for (let i = 0; i < 100; i++) {
+    let randomState = VillageState.random();
+    arr1.push(run(randomState, robot1, memory1));
+    arr2.push(run(randomState, robot2, memory2));
+  }
+  let average1 = arr1.reduce((a, b) => a + b, 0) / 100;
+  let average2 = arr2.reduce((a, b) => a + b, 0) / 100;
+  console.log(`Robot1 : ${average1} \nRobot2 : ${average2}`);
 }
 console.log(initialState);
-runRobot(initialState, goalOrientedRobot, []);
+// runRobot(initialState, goalOrientedRobot, []);
+compareRobots(routeRobot, [], goalOrientedRobot, []);
 //console.log(roadGraph);
