@@ -148,8 +148,32 @@ function smartGoalOrientedRobot({ place, parcels }, route) {
     let temp = shortestPath(next);
 
     route = temp.route;
-    console.log(route);
   }
+  return { direction: route[0], memory: route.slice(1) };
+}
+
+function lazyRobot({ place, parcels }, route) {
+  if (route.length == 0) {
+    let routes = parcels.map((parcel) => {
+      if (parcel.place != place) {
+        return {
+          route: findRoute(roadGraph, place, parcel.place),
+          pickUp: true,
+        };
+      } else {
+        return {
+          route: findRoute(roadGraph, place, parcel.address),
+          pickUp: false,
+        };
+      }
+    });
+
+    function score({ route, pickUp }) {
+      return (pickUp ? 0.5 : 0) - route.length;
+    }
+    route = routes.reduce((a, b) => (score(a) > score(b) ? a : b)).route;
+  }
+
   return { direction: route[0], memory: route.slice(1) };
 }
 
@@ -176,9 +200,9 @@ function compareRobots(robot1, memory1, robot2, memory2) {
   console.log(`Robot1 : ${average1} \nRobot2 : ${average2}`);
 }
 let initialState = VillageState.random();
-console.log(initialState);
 // console.log(initialState);
-// runRobot(initialState, , []);
+// console.log(initialState);
+// runRobot(initialState,smartGoalOrientedRobot , []);
 
-compareRobots(smartGoalOrientedRobot, [], goalOrientedRobot, []);
+compareRobots(smartGoalOrientedRobot, [], lazyRobot, []);
 //console.log(roadGraph);
