@@ -127,25 +127,28 @@ function goalOrientedRobot({ place, parcels }, route) {
   return { direction: route[0], memory: route.slice(1) };
 }
 function smartGoalOrientedRobot({ place, parcels }, route) {
-  if (route.length == 0) {
-    //checks if we are picking up a parcel
-    if (parcels.some((a) => a.place === place)) {
-      console.log("picked up a parcel");
-      let currentParcel = parcels.find((a) => a.place === place);
-      route = findRoute(roadGraph, place, currentParcel.address);
-      parcels = parcels.filter((e) => e != currentParcel);
-    } else {
-      console.log("finding a parcel");
-      let nextParcel = parcels.reduce(
-        (prev, next) => {
-          let len1 = findRoute(roadGraph, place, prev.address).length;
-          let len2 = findRoute(roadGraph, place, next.address).length;
-          return len2 > len1 ? next : prev;
-        },
-        { address: place }
-      );
-      route = findRoute(roadGraph, place, nextParcel.place);
-    }
+  function shortestPath(parcel) {
+    if (parcel.place === place)
+      return {
+        route: findRoute(roadGraph, place, parcel.address),
+        direction: "address",
+      };
+    return {
+      route: findRoute(roadGraph, place, parcel.place),
+      direction: "place",
+    };
+  }
+  if (route.length === 0) {
+    let next = parcels.reduce((prev, current) => {
+      return shortestPath(current).route.length <
+        shortestPath(prev).route.length
+        ? current
+        : prev;
+    });
+    let temp = shortestPath(next);
+
+    route = temp.route;
+    console.log(route);
   }
   return { direction: route[0], memory: route.slice(1) };
 }
@@ -175,7 +178,7 @@ function compareRobots(robot1, memory1, robot2, memory2) {
 let initialState = VillageState.random();
 console.log(initialState);
 // console.log(initialState);
-runRobot(initialState, smartGoalOrientedRobot, []);
+// runRobot(initialState, , []);
 
-// compareRobots(routeRobot, [], goalOrientedRobot, []);
+compareRobots(smartGoalOrientedRobot, [], goalOrientedRobot, []);
 //console.log(roadGraph);
