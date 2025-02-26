@@ -50,11 +50,6 @@ class VillageState {
     }
   }
 }
-let first = new VillageState("Post Office", [
-  { place: "Post Office", address: "Alice's House" },
-]);
-let next = first.move("Marketplace");
-console.log(next.place, next.parcels);
 
 function runRobot(state, robot, memory) {
   for (let turn = 0; ; turn++) {
@@ -131,7 +126,29 @@ function goalOrientedRobot({ place, parcels }, route) {
   }
   return { direction: route[0], memory: route.slice(1) };
 }
-let initialState = VillageState.random();
+function smartGoalOrientedRobot({ place, parcels }, route) {
+  if (route.length == 0) {
+    //checks if we are picking up a parcel
+    if (parcels.some((a) => a.place === place)) {
+      console.log("picked up a parcel");
+      let currentParcel = parcels.find((a) => a.place === place);
+      route = findRoute(roadGraph, place, currentParcel.address);
+      parcels = parcels.filter((e) => e != currentParcel);
+    } else {
+      console.log("finding a parcel");
+      let nextParcel = parcels.reduce(
+        (prev, next) => {
+          let len1 = findRoute(roadGraph, place, prev.address).length;
+          let len2 = findRoute(roadGraph, place, next.address).length;
+          return len2 > len1 ? next : prev;
+        },
+        { address: place }
+      );
+      route = findRoute(roadGraph, place, nextParcel.place);
+    }
+  }
+  return { direction: route[0], memory: route.slice(1) };
+}
 
 function compareRobots(robot1, memory1, robot2, memory2) {
   function run(state, robot, memory) {
@@ -155,7 +172,10 @@ function compareRobots(robot1, memory1, robot2, memory2) {
   let average2 = arr2.reduce((a, b) => a + b, 0) / 100;
   console.log(`Robot1 : ${average1} \nRobot2 : ${average2}`);
 }
+let initialState = VillageState.random();
 console.log(initialState);
-// runRobot(initialState, goalOrientedRobot, []);
-compareRobots(routeRobot, [], goalOrientedRobot, []);
+// console.log(initialState);
+runRobot(initialState, smartGoalOrientedRobot, []);
+
+// compareRobots(routeRobot, [], goalOrientedRobot, []);
 //console.log(roadGraph);
