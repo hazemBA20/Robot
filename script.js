@@ -203,6 +203,5 @@ let initialState = VillageState.random();
 // console.log(initialState);
 // console.log(initialState);
 // runRobot(initialState,smartGoalOrientedRobot , []);
-
 compareRobots(smartGoalOrientedRobot, [], lazyRobot, []);
 //console.log(roadGraph);
